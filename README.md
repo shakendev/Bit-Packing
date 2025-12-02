@@ -1,3 +1,3 @@
 # Bit Packing Concept App
 
-<img width="447" height="891" alt="Screenshot 2025-12-02 at 8 48 32 PM" src="https://github.com/user-attachments/assets/9550e2cc-4a4e-4e33-b6eb-99278ddac57a" />
+<img width="612" height="708" alt="Screenshot 2025-12-03 at 12 40 32 AM" src="https://github.com/user-attachments/assets/d6f6ee10-7e79-4ca6-aea8-96927a9883f7" />
