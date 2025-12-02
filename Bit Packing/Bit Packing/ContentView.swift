@@ -8,114 +8,116 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var byte: UInt8 = .zero
-    @State private var lastReadByte: UInt8?
+    @State private var number: UInt8 = .zero
+    @State private var lastReadNumber: UInt8?
 
-    @State private var position: UInt8 = .zero
+    @State private var position: Int = .zero
 
     var body: some View {
-        VStack(spacing: 50) {
-            Text("Bit Packing")
-                .font(.system(size: 40))
-                .bold()
-
-            VStack(spacing: 50) {
-                VStack(spacing: 20) {
-                    HStack {
-                        Text("Byte:  ")
-
-                        Text(byte.asString)
-
-                        Spacer()
-
-                        HStack(spacing: 10) {
-                            Text("|")
-
-                            Spacer()
-
-                            Text("\(byte)")
-                        }
-                        .frame(width: 120)
-                    }
-
-                    HStack {
-                        Text("State (at \(position))")
-
-                        Spacer()
-
-                        HStack(spacing: 10) {
-                            Text("|")
-
-                            Spacer()
-
-                            if let lastReadByte {
-                                let state = Bool(lastReadByte)
-
-                                Text(state.description)
-                            } else {
-                                Text("?")
-                            }
-                        }
-                        .frame(width: 120)
-                    }
-                }
-                .font(.system(size: 20, weight: .bold, design: .monospaced))
-
-                Stepper("Position: \(position)", value: $position, in: 0 ... 7, step: 1)
-                    .font(.system(size: 20, weight: .bold, design: .monospaced))
-
-                VStack(spacing: 40) {
-                    HStack(spacing: 10) {
-                        Button("Clear", action: clear)
-                        Button("Read", action: read)
-                        Button("Set", action: `set`)
-                        Button("Toggle", action: toggle)
-                    }
-
-                    Button("Reset", role: .destructive, action: reset)
-                }
-                .buttonStyle(.borderedProminent)
+        Color.black
+            .ignoresSafeArea()
+            .overlay(alignment: .top) {
+                Text("Bit Packing")
+                    .font(.system(size: 50, weight: .heavy, design: .monospaced))
+                    .padding(.top, 100)
             }
-            .padding(.horizontal)
-        }
+            .overlay {
+                VStack(spacing: 50) {
+                    HStack(spacing: 10) {
+                        let array = number.asString.array
+
+                        ForEach(array.indices, id: \.self) { index in
+                            Text("\(array[index])")
+                                .background {
+                                    if index == position {
+                                        Color.white.opacity(0.2)
+                                            .clipShape(.rect(cornerRadius: 5))
+                                            .padding(.horizontal, -5)
+                                    }
+                                }
+                                .onTapGesture {
+                                    position = index
+                                }
+                        }
+                        .font(.system(size: 40, weight: .bold, design: .monospaced))
+                    }
+                    .frame(maxWidth: .infinity)
+                    .overlay(alignment: .topTrailing) {
+                        Text(" \(number)")
+                            .font(.system(size: 20, weight: .bold, design: .monospaced))
+                    }
+
+                    VStack(spacing: 50) {
+                        VStack(spacing: 25) {
+                            Group {
+                                if let lastReadNumber {
+                                    let state = Bool(lastReadNumber)
+
+                                    Text("Read State: \(state.description)")
+                                } else {
+                                    Text("Read State: ?")
+                                }
+                            }
+                            .font(.system(size: 20, weight: .bold, design: .monospaced))
+                            .frame(maxWidth: .infinity, alignment: .leading)
+
+                            Text("Position: \(position)")
+                                .font(.system(size: 20, weight: .bold, design: .monospaced))
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+
+                        VStack(spacing: 40) {
+                            HStack(spacing: 10) {
+                                Button("Clear", action: clear)
+                                Button("Read", action: read)
+                                Button("Set", action: `set`)
+                                Button("Toggle", action: toggle)
+                            }
+
+                            Button("Reset", role: .destructive, action: reset)
+                        }
+                        .buttonStyle(.borderedProminent)
+                    }
+                }
+                .padding(.top, 100)
+                .padding(.horizontal)
+            }
+    }
+
+    private func mirrorPosition(_ position: Int) -> UInt8 {
+        let position = (UInt8.bitWidth - 1) - position
+
+        return .init(position)
     }
 
     private func clear() {
-        byte = BitField.clear(byte, at: position)
+        let mirroredPosition = mirrorPosition(position)
+
+        number = BitPackingOperations.clear(number, at: mirroredPosition)
     }
 
     private func read() {
-        lastReadByte = BitField.read(byte, at: position)
+        let mirroredPosition = mirrorPosition(position)
+
+        lastReadNumber = BitPackingOperations.read(number, at: mirroredPosition)
     }
 
     private func set() {
-        byte = BitField.set(byte, at: position)
+        let mirroredPosition = mirrorPosition(position)
+
+        number = BitPackingOperations.set(number, at: mirroredPosition)
     }
 
     private func toggle() {
-        byte = BitField.toggle(byte, at: position)
+        let mirroredPosition = mirrorPosition(position)
+
+        number = BitPackingOperations.toggle(number, at: mirroredPosition)
     }
 
     private func reset() {
-        byte = .zero
-    }
-}
-
-extension UInt8 {
-    var asString: String {
-        let leadingZeroBitString = String(repeating: "0", count: leadingZeroBitCount)
-
-        guard leadingZeroBitCount < bitWidth else {
-            return leadingZeroBitString
-        }
-
-        return leadingZeroBitString + .init(self, radix: 2)
-    }
-}
-
-extension Bool {
-    init(_ byte: UInt8) {
-        self = byte != .zero
+        number = .zero
+        lastReadNumber = nil
+        position = .zero
     }
 }
 

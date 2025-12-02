@@ -1,19 +1,19 @@
 import Foundation
 
-enum BitField {
-    static func clear(_ byte: UInt8, at position: UInt8) -> UInt8 {
-        byte & ~(1 << position)
+enum BitPackingOperations {
+    static func clear<Number: UnsignedInteger>(_ number: Number, at position: UInt8) -> Number {
+        number & ~(1 << position)
     }
 
-    static func read(_ byte: UInt8, at position: UInt8) -> UInt8 {
-        (byte >> position) & 1
+    static func read<Number: UnsignedInteger>(_ number: Number, at position: UInt8) -> Number {
+        (number >> position) & 1
     }
 
-    static func set(_ byte: UInt8, at position: UInt8) -> UInt8 {
-        byte | (1 << position)
+    static func set<Number: UnsignedInteger>(_ number: Number, at position: UInt8) -> Number {
+        number | (1 << position)
     }
 
-    static func toggle(_ byte: UInt8, at position: UInt8) -> UInt8 {
-        byte ^ (1 << position)
+    static func toggle<Number: UnsignedInteger>(_ number: Number, at position: UInt8) -> Number {
+        number ^ (1 << position)
     }
 }

@@ -12,6 +12,7 @@ struct Bit_PackingApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .preferredColorScheme(.dark)
         }
     }
 }
